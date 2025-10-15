@@ -149,15 +149,17 @@ The tool will:
 
 ### Creating a Release
 
-Releases are created using GitHub Actions:
+Releases are created using GitHub Actions and automatically use the version from `Cargo.toml`:
 
-1. Go to the [Actions tab](https://github.com/ShaunSHamilton/mongo-copy/actions)
-2. Select the "Release" workflow
-3. Click "Run workflow"
-4. Enter the release tag (e.g., `v0.2.0`)
+1. Update the version in `Cargo.toml` (e.g., `version = "0.3.0"`)
+2. Commit the version change
+3. Go to the [Actions tab](https://github.com/ShaunSHamilton/mongo-copy/actions)
+4. Select the "Release" workflow
 5. Click "Run workflow"
+6. Click "Run workflow" to confirm
 
 The workflow will:
+- Automatically extract the version from `Cargo.toml`
 - Build binaries for all supported platforms and architectures
-- Create a GitHub release with the specified tag
+- Create a GitHub release with tag `v{version}` (e.g., `v0.3.0`)
 - Attach all binaries to the release
