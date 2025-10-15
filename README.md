@@ -4,6 +4,15 @@ A powerful command-line tool for copying MongoDB databases and collections betwe
 
 ## Installation
 
+### Download Pre-built Binary
+
+Download the latest release for your platform from the [Releases page](https://github.com/ShaunSHamilton/mongo-copy/releases).
+
+Available platforms:
+- Linux (x86_64, aarch64)
+- macOS (x86_64 Intel, aarch64 Apple Silicon)
+- Windows (x86_64)
+
 ### Build from source
 
 ```bash
@@ -135,3 +144,22 @@ The tool will:
 - No automatic index copying (indexes must be recreated manually)
 - No schema validation during copy
 - Requires network connectivity to both MongoDB instances
+
+## For Maintainers
+
+### Creating a Release
+
+Releases are created using GitHub Actions and automatically use the version from `Cargo.toml`:
+
+1. Update the version in `Cargo.toml` (e.g., `version = "0.3.0"`)
+2. Commit the version change
+3. Go to the [Actions tab](https://github.com/ShaunSHamilton/mongo-copy/actions)
+4. Select the "Release" workflow
+5. Click "Run workflow"
+6. Click "Run workflow" to confirm
+
+The workflow will:
+- Automatically extract the version from `Cargo.toml`
+- Build binaries for all supported platforms and architectures
+- Create a GitHub release with tag `v{version}` (e.g., `v0.3.0`)
+- Attach all binaries to the release
