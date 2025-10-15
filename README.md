@@ -2,24 +2,7 @@
 
 A powerful command-line tool for copying MongoDB databases and collections between instances with interactive selection and flexible options.
 
-## Features
-
-- [x] Copy entire databases or specific collections
-- [x] Interactive selection with multi-select support
-- [x] Sample data copying (copy only N documents)
-- [x] Rename databases/collections during copy
-- [x] Display document counts before copying
-- [x] Batch processing for efficient data transfer
-- [x] Connection URI masking for security
-- [x] Environment variable support
-- [x] Progress indicators during copy operations
-
 ## Installation
-
-### Prerequisites
-
-- Rust toolchain (1.70+)
-- Access to source and destination MongoDB instances
 
 ### Build from source
 
@@ -37,12 +20,6 @@ Run the CLI without arguments to use interactive prompts:
 
 ```bash
 cargo run --release
-```
-
-Or use the compiled binary:
-
-```bash
-./target/release/mongo-copy
 ```
 
 ### Using Environment Variables
@@ -158,20 +135,3 @@ The tool will:
 - No automatic index copying (indexes must be recreated manually)
 - No schema validation during copy
 - Requires network connectivity to both MongoDB instances
-
-## Dependencies
-
-- `clap` - Command-line argument parsing
-- `mongodb` - Official MongoDB Rust driver
-- `inquire` - Interactive CLI prompts
-- `tokio` - Async runtime
-- `anyhow` - Error handling
-- `futures` - Async utilities
-
-## License
-
-This project is provided as-is for educational and practical use.
-
-## Contributing
-
-Contributions are welcome! Please feel free to submit issues or pull requests.

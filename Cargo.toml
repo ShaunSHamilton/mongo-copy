@@ -1,7 +1,16 @@
 [package]
 name = "mongo-copy"
 version = "0.2.0"
-edition = "2024"
+edition = "2021"
+authors = ["Shaun Hamilton <shauhami020@gmail.com>"]
+description = "A powerful command-line tool for copying MongoDB databases and collections between instances"
+readme = "README.md"
+homepage = "https://github.com/ShaunSHamilton/mongo-copy"
+repository = "https://github.com/ShaunSHamilton/mongo-copy"
+license = "MIT"
+keywords = ["mongodb", "database", "cli", "copy", "migration"]
+categories = ["command-line-utilities", "database"]
+rust-version = "1.70"
 
 [dependencies]
 clap = { version = "4.5", features = ["derive"] }
