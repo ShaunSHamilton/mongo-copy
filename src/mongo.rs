@@ -32,7 +32,14 @@ impl MongoConnection {
                 debug!("MongoDB connection test successful");
             }
             Err(e) => {
-                error!("MongoDB connection test failed: {}", e);
+                match e.kind.as_ref() {
+                    mongodb::error::ErrorKind::ServerSelection { message, .. } => {
+                        info!("Likely, the URI needs to include the `directConnection=true` parameter.");
+                    }
+                    _ => {
+                        error!("MongoDB connection test failed: {}", e);
+                    }
+                }
                 return Err(e).context("Failed to connect to MongoDB");
             }
         }
