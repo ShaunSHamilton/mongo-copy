@@ -84,7 +84,7 @@ jobs:
       - name: Build binary
         run: cargo build --release --target ${{ matrix.target }}
         env:
-          CARGO_TARGET_AARCH64_UNKNOWN_LINUX_GNU_LINKER: aarch64-linux-gnu-gcc
+          CARGO_TARGET_AARCH64_UNKNOWN_LINUX_GNU_LINKER: ${{ matrix.target == 'aarch64-unknown-linux-gnu' && 'aarch64-linux-gnu-gcc' || '' }}
 
       - name: Strip binary (Linux and macOS)
         if: matrix.os != 'windows-latest'
@@ -114,9 +114,6 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           path: artifacts
-
-      - name: Display structure of downloaded files
-        run: ls -R artifacts
 
       - name: Create Release
         uses: softprops/action-gh-release@v2
