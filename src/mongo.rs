@@ -33,7 +33,7 @@ impl MongoConnection {
             }
             Err(e) => {
                 match e.kind.as_ref() {
-                    mongodb::error::ErrorKind::ServerSelection { message, .. } => {
+                    mongodb::error::ErrorKind::ServerSelection { .. } => {
                         info!("Likely, the URI needs to include the `directConnection=true` parameter.");
                     }
                     _ => {
