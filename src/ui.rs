@@ -1,17 +1,113 @@
 use anyhow::Result;
 use inquire::{Confirm, MultiSelect, Select, Text};
+use tracing::{debug, info};
 
+use crate::config::Config;
+use crate::keystore::KeyStore;
 use crate::mongo::MongoConnection;
 
-pub fn get_mongodb_uri(env_var: &str, prompt: &str) -> Result<String> {
-    if let Ok(uri) = std::env::var(env_var) {
-        println!("Using {} from environment", env_var);
-        Ok(uri)
+pub fn get_mongodb_uri(env_var: &str, prompt: &str, skip_env: bool) -> Result<String> {
+    // Check environment variable first (unless skip_env is true)
+    if !skip_env {
+        if let Ok(uri) = std::env::var(env_var) {
+            info!("Using {} from environment", env_var);
+            return Ok(uri);
+        }
+    }
+
+    // Load saved URIs from config
+    let config = Config::load()?;
+    let saved_names = config.list_names();
+
+    if !saved_names.is_empty() {
+        debug!("Found {} saved URI(s)", saved_names.len());
+
+        // Add options for saved URIs and manual entry
+        let mut options = saved_names.clone();
+        options.push("Enter new URI manually".to_string());
+        options.push("Manage saved URIs".to_string());
+
+        let selection = Select::new(prompt, options).prompt()?;
+
+        if selection == "Enter new URI manually" {
+            prompt_and_save_uri(&config)
+        } else if selection == "Manage saved URIs" {
+            manage_saved_uris()
+        } else {
+            // Load URI from keyring
+            debug!("Loading URI from keyring: {}", selection);
+            if let Some(uri) = KeyStore::get_uri(&selection)? {
+                info!("Using saved URI: {}", selection);
+                Ok(uri)
+            } else {
+                info!("URI not found in keyring, prompting for manual entry");
+                prompt_and_save_uri(&config)
+            }
+        }
     } else {
-        let uri = Text::new(prompt)
-            .with_help_message("Example: mongodb://localhost:27017")
+        debug!("No saved URIs found");
+        prompt_and_save_uri(&config)
+    }
+}
+
+fn prompt_and_save_uri(config: &Config) -> Result<String> {
+    let uri = Text::new("Enter MongoDB URI:")
+        .with_help_message("Example: mongodb://localhost:27017")
+        .prompt()?;
+
+    let save = Confirm::new("Save this URI for future use?")
+        .with_default(true)
+        .prompt()?;
+
+    if save {
+        let name = Text::new("Enter a name for this URI:")
+            .with_help_message("Example: production, local, staging")
             .prompt()?;
-        Ok(uri)
+
+        debug!("Saving URI with name: {}", name);
+        KeyStore::store_uri(&name, &uri)?;
+
+        let mut config = config.clone();
+        config.add_uri(name.clone(), String::new())?; // Store name only in config
+        info!("URI saved as: {}", name);
+    }
+
+    Ok(uri)
+}
+
+fn manage_saved_uris() -> Result<String> {
+    let mut config = Config::load()?;
+
+    loop {
+        let saved_names = config.list_names();
+
+        if saved_names.is_empty() {
+            info!("No saved URIs to manage");
+            // Reload config and prompt for new URI
+            let config = Config::load()?;
+            return prompt_and_save_uri(&config);
+        }
+
+        let mut options = vec!["← Back to URI selection".to_string()];
+        options.extend(saved_names.iter().map(|name| format!("Delete: {}", name)));
+
+        let selection = Select::new("Manage saved URIs:", options).prompt()?;
+
+        if selection == "← Back to URI selection" {
+            // Reload config and prompt for new URI
+            let config = Config::load()?;
+            return prompt_and_save_uri(&config);
+        } else if let Some(name) = selection.strip_prefix("Delete: ") {
+            let confirm = Confirm::new(&format!("Delete saved URI '{}'?", name))
+                .with_default(false)
+                .prompt()?;
+
+            if confirm {
+                KeyStore::delete_uri(name)?;
+                config.remove_uri(name)?;
+                info!("Deleted saved URI: {}", name);
+            }
+        }
     }
 }
 

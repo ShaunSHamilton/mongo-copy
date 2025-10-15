@@ -1,3 +1,5 @@
+mod config;
+mod keystore;
 mod mongo;
 mod ui;
 
@@ -23,6 +25,10 @@ struct Cli {
     /// Destination MongoDB URI (overrides MONGODB_URI_DESTINATION env var)
     #[arg(long)]
     destination: Option<String>,
+
+    /// Skip environment variables and show saved URIs
+    #[arg(long)]
+    skip_env: bool,
 }
 
 #[tokio::main]
@@ -39,9 +45,10 @@ async fn main() -> Result<()> {
 
     info!("MongoDB Copy");
     debug!(
-        "Parsed CLI arguments: source={:?}, destination={:?}",
+        "Parsed CLI arguments: source={:?}, destination={:?}, skip_env={}",
         cli.source.is_some(),
-        cli.destination.is_some()
+        cli.destination.is_some(),
+        cli.skip_env
     );
 
     // Get source URI
@@ -49,7 +56,11 @@ async fn main() -> Result<()> {
         debug!("Using source URI from CLI argument");
         uri
     } else {
-        get_mongodb_uri("MONGODB_URI_SOURCE", "Enter source MongoDB URI:")?
+        get_mongodb_uri(
+            "MONGODB_URI_SOURCE",
+            "Select or enter source MongoDB URI:",
+            cli.skip_env,
+        )?
     };
 
     // Get destination URI
@@ -57,7 +68,11 @@ async fn main() -> Result<()> {
         debug!("Using destination URI from CLI argument");
         uri
     } else {
-        get_mongodb_uri("MONGODB_URI_DESTINATION", "Enter destination MongoDB URI:")?
+        get_mongodb_uri(
+            "MONGODB_URI_DESTINATION",
+            "Select or enter destination MongoDB URI:",
+            cli.skip_env,
+        )?
     };
 
     info!("Connecting to MongoDB instances...");
