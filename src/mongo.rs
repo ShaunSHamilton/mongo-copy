@@ -1,9 +1,9 @@
 use anyhow::{Context, Result};
 use futures::stream::TryStreamExt;
 use mongodb::{
-    Client, Database,
-    bson::{Document, doc},
+    bson::{doc, Document},
     options::ClientOptions,
+    Client, Database,
 };
 use tracing::{debug, error, info, warn};
 
@@ -19,8 +19,7 @@ impl MongoConnection {
             .await
             .context("Failed to parse MongoDB URI")?;
         client_options.app_name = Some("mongo-copy".to_string());
-        client_options.direct_connection = Some(true);
-        debug!("MongoDB client options configured: app_name=mongo-copy, direct_connection=true");
+        debug!("MongoDB client options configured: app_name=mongo-copy");
 
         debug!("Creating MongoDB client");
         let client =

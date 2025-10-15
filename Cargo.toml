@@ -1,6 +1,6 @@
 [package]
 name = "mongo-copy"
-version = "0.2.0"
+version = "0.2.1"
 edition = "2021"
 authors = ["Shaun Hamilton <shauhami020@gmail.com>"]
 description = "A powerful command-line tool for copying MongoDB databases and collections between instances"

@@ -108,7 +108,7 @@ mongodb://[username:password@]host[:port][/database][?options]
 
 Examples:
 
-- `mongodb://localhost:27017`
+- `mongodb://127.0.0.1:27017/?directConnection=true`
 - `mongodb://user:pass@localhost:27017`
 - `mongodb://user:pass@host1:27017,host2:27017/mydb?replicaSet=rs0`
 - `mongodb+srv://user:pass@cluster.mongodb.net/mydb`
